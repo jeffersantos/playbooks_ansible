@@ -1,0 +1,43 @@
+---
+- hosts: rhel7
+  become: yes
+
+  tasks:
+   - replace:
+      path: /etc/hosts
+      regexp: '(\s+)old\.host\.name(\s+.*)?$'
+      replace: '\1new.host.name\2'
+      backup: yes
+
+   - name: Install NTP Client
+     yum: name=ntp state=present
+
+   - name: Ensure NTPD Stopped
+     service: name=ntpd state=stopped enabled=yes
+
+   - lineinfile:
+      path: /etc/ntp.conf
+      regexp: '^server'
+      line: 'server 192.168.0.100'
+
+   - name: Ensure NTPD Started
+     service: name=ntpd state=started enabled=yes
+
+   - name: Timedatectl
+     shell: 'timedatectl set-ntp false; timedatectl set-ntp true'
+
+   - name: Resultado NTP
+     shell: "ntpdate -d 192.168.0.100"
+     register: busca_ntp
+
+   - debug:
+      var: busca_ntp.stdout_lines
+
+   - name: Final NTP
+     shell: "ntpq -p"
+     register: saida_final
+
+   - debug:
+      var: saida_final.stdout
+     
+
