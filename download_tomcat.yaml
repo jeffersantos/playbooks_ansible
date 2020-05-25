@@ -1,0 +1,13 @@
+---
+- hosts: middleware
+  become: yes
+  vars:
+    req_java: java-11-openjdk
+    set_java: jre-11-openjdk
+    req_tomcat_version: 9.0.35
+    tomcat_url: http://mirror.nbtelecom.com.br/apache/tomcat/tomcat-{{req_tomcat_version.split(".")[0]}}/v{{req_tomcat_version}}/bin/apache-tomcat-{{req_tomcat_version}}.tar.gz
+  tasks:
+    - name: Download required tomcat
+      get_url:
+        url: "{{tomcat_url}}"
+        dest: /u01

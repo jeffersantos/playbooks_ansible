@@ -1,0 +1,12 @@
+---
+- hosts: middleware
+  become: yes
+  vars_files:
+    - variables_jvm1.conf
+  tasks:
+    - name: Template Jinja Server.xml
+      template:
+        src: server.xml.j2
+        dest: /u01/jvm1/conf/server.xml
+    - name: Start jvm1
+      shell: nohup /u01/jvm1/bin/startup.sh &
